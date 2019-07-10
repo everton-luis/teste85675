@@ -26,23 +26,21 @@ import com.treasy.dev.services.exceptions.ParentIdNaoEncontradoException;
 @RequestMapping("/node")
 public class UsuariosResources {
 	
-	@Autowired
-	private UsuariosRepository usuariosRepository;
-	
 	
 	@Autowired
 	private UsuariosService usuariosService;
 	
-	@Autowired
-	private ChildrenRepository childrenRepository;
-
+	
 	@RequestMapping(method = RequestMethod.GET)
-	public ResponseEntity<List<Usuario>> listar() {
+		public ResponseEntity<List<Usuario>> listar() {
+			
+			List<Usuario> usuario = usuariosService.listar();
 		
-		return ResponseEntity.status(HttpStatus.OK).body(usuariosService.listar());
-		
-		
+			return ResponseEntity.status(HttpStatus.OK).body(usuario);
+			
+			
 	}
+	
 	
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<Void> salvar(@RequestBody Usuario usuario) {
@@ -57,97 +55,84 @@ public class UsuariosResources {
 	
 	
 	
-	@RequestMapping(value = "/{parentId}", method = RequestMethod.GET)
-	public ResponseEntity <List<Usuario>> listarParentId(@PathVariable("parentId") Long parentId){
+	@RequestMapping(value = "/{parentId}" , method = RequestMethod.GET)
+	public ResponseEntity<List<Usuario>> buscarParentId(@PathVariable("parentId") Long parentId) throws Exception{
 		
-		List<Usuario> usuario = null;
-		
-		
-		try {
-			usuario = usuariosService.listaParentId(parentId);
-		}catch(EmptyResultDataAccessException e) {
-			throw new ParentIdNaoEncontradoException("parentId não encontrado");
-		}
-		
+		List<Usuario> usuario = usuariosService.buscarParentId(parentId);
 		return ResponseEntity.status(HttpStatus.OK).body(usuario);
-		
-		
 	}
 	
+	//@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	//public ResponseEntity<Usuario> buscarId(@PathVariable("id") Long id){
+		//Usuario usuario = usuariosService.buscarId(id);
+		//return ResponseEntity.status(HttpStatus.OK).body(usuario);
+	//}
+	
+	
+	
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<Void> deletar(@PathVariable("id") Long id) {
-		
-		try {
-			
-			usuariosService.deletar(id);
-		}catch(EmptyResultDataAccessException e) {
-			return ResponseEntity.notFound().build();
-		}
+	public ResponseEntity<Void> deletar(@PathVariable("id") Long id) throws Exception{
+		usuariosService.deletar(id);
 		return ResponseEntity.noContent().build();
 	}
 	
+	
+	
 	@RequestMapping(method = RequestMethod.PUT)
 	public ResponseEntity<Void> atualizar(@RequestBody Usuario usuario) {
-		
-		
 		
 		usuariosService.atualizar(usuario);
 		
 		return ResponseEntity.noContent().build();
 	}
 	
+	//@RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+	//public ResponseEntity<Void> atualizarId(@RequestBody Usuario usuario,
+			//@PathVariable("id") Long id){
+		//usuariosService.atualizarId(id, usuario);
+		//return ResponseEntity.noContent().build();
+	//}
 	
 	
 	@RequestMapping(value = "/{id}/children", method = RequestMethod.POST)
-	public ResponseEntity<Void> adicionarChildren(@PathVariable("id") Long id,
-			@RequestBody Children children){
-		Usuario usuario = usuariosRepository.findOne(id);
-		children.setUsuario(usuario);
-		childrenRepository.save(children);
-		
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
-		return ResponseEntity.created(uri).build();
-	}
+		public ResponseEntity<Void> adicionarChildren(@PathVariable("id") Long id,
+				@RequestBody Children children) {
+			
+				usuariosService.salvarChildren(id, children);
+				
+				
+				URI uri = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+				return ResponseEntity.created(uri).build();
+				
+		}
 	
+	
+	@RequestMapping(value = "/children/{id}", method = RequestMethod.GET)
+		public ResponseEntity<Children> buscarChildren(@PathVariable("id") Long id)  {
+			Children children = usuariosService.buscarChildren(id);
+			return ResponseEntity.status(HttpStatus.OK).body(children);
+	}
 	
 	
 	@RequestMapping(value = "/children/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<Void> deletarChildren(@PathVariable("id") Long id){
-		try {
-			childrenRepository.delete(id);
-		}catch(EmptyResultDataAccessException e) {
-			return ResponseEntity.notFound().build();
-		}
+		public ResponseEntity<Void> deletarChildren(@PathVariable("id") Long id) {
 		
+		usuariosService.deletarChildren(id);
 		return ResponseEntity.noContent().build();
+		
 	}
 	
 	
 	
-		@RequestMapping(value = "{id_usuario}/children/{id}", method = RequestMethod.PUT)
-			public ResponseEntity<Void> atualizarChildren(@RequestBody Children children, 
-				@PathVariable("id_usuario") Long id_usuario, @PathVariable("id") Long id) {
+	@RequestMapping(value = "/{id_usuario}/children/{id}", method = RequestMethod.PUT)
+		public ResponseEntity<Void> atualizarChildren(@RequestBody Children children, 
+			@PathVariable("id_usuario") Long id_usuario, @PathVariable("id") Long id) {
 				
-				try {
-					Usuario usuario = usuariosRepository.findOne(id_usuario);
-					children.setUsuario(usuario);
-					Children children1 = childrenRepository.findOne(id);
-					children.setId(id);
-					if(children1 == null) {
-						throw new Exception();
-					}
-					childrenRepository.save(children);
+				usuariosService.atualizarChildren(id_usuario, children, id);
 					
-				}catch(Exception e) {
-					return ResponseEntity.notFound().build();
-				}
-				
-				
 				return ResponseEntity.noContent().build();
-			}
-	
-	
-	
+				
+		}
 	
 	
 }

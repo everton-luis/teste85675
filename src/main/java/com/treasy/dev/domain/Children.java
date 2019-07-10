@@ -17,11 +17,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class Children {
 	
-	//@Id
-	//@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
-	@GeneratedValue(generator = "increment")
-	@GenericGenerator(name = "increment", strategy = "increment")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	//@Id
+	//@GeneratedValue(generator = "increment")
+	//@GenericGenerator(name = "increment", strategy = "increment")
 	private Long id;
 	
 	private String code;

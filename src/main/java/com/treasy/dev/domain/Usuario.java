@@ -16,13 +16,13 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @Entity
 public class Usuario {
 	
-	//@JsonInclude(Include.NON_NULL)
-	//@Id
-	//@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonInclude(Include.NON_NULL)
 	@Id
-	@GeneratedValue(generator = "increment")
-	@GenericGenerator(name = "increment", strategy = "increment")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	//@JsonInclude(Include.NON_NULL)
+	//@Id
+	//@GeneratedValue(generator = "increment")
+	//@GenericGenerator(name = "increment", strategy = "increment")
 	private Long id;
 	
 	@JsonInclude(Include.NON_NULL)
